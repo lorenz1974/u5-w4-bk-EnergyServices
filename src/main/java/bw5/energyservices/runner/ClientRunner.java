@@ -5,12 +5,14 @@ import bw5.energyservices.repository.ClientRepository;
 import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Order(3)
 @Component
 @RequiredArgsConstructor
 public class ClientRunner implements CommandLineRunner {
