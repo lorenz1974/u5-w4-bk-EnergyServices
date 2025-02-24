@@ -40,4 +40,5 @@ public class AppUser {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
+
 }

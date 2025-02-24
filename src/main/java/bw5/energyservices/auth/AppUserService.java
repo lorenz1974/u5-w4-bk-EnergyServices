@@ -2,6 +2,7 @@ package bw5.energyservices.auth;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,19 +16,16 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class AppUserService {
 
-    @Autowired
-    private AppUserRepository appUserRepository;
+   final private AppUserRepository appUserRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    final private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    final private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    final private JwtTokenUtil jwtTokenUtil;
 
     public AppUser registerUser(String username, String password, String firstName, String lastName, String email, Set<Role> roles) {
         // Check if the username already exists
@@ -44,10 +42,10 @@ public class AppUserService {
         AppUser appUser = new AppUser();
         appUser.setUsername(username);
         appUser.setPassword(passwordEncoder.encode(password));
-        appUser.setFirstName(firstName);  // Set the first name
-        appUser.setLastName(lastName);    // Set the last name
-        appUser.setEmail(email);          // Set the email
-        appUser.setRoles(roles);          // Set the roles
+        appUser.setFirstName(firstName);
+        appUser.setLastName(lastName);
+        appUser.setEmail(email);
+        appUser.setRoles(roles);
 
         // Save and return the AppUser
         return appUserRepository.save(appUser);
