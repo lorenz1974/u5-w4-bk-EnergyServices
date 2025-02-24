@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start PostgreSQL Container",
+            "type": "shell",
+            "command": "docker run --name dock-postgres -e POSTGRES_PASSWORD=123456 -p 5432:5432 -v \"C:\\Users\\LorenzoLione\\Downloads\\EPICODE\\posgresDB:/var/lib/postgresql/data\" -d postgres",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

@@ -1,0 +1,29 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "EnergyservicesApplication",
+      "request": "launch",
+      "mainClass": "bw5.energyservices.EnergyservicesApplication",
+      "projectName": "energyservices",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "env": {
+        "DB_URL": "jdbc:postgresql://localhost:5432/energy-services",
+        "DB_USER": "postgres",
+        "DB_PASSWORD": "123456",
+        "MAIL_HOST": "smtp.gmail.com",
+        "MAIL_PORT": "587",
+        "MAIL_USER": "lorenzo.lione@gmail.com",
+        "MAIL_PWD": "ewrm cjkz yxax kmmg",
+        "CLOUDINARY_CLOUD_NAME": "drjiv5crq",
+        "CLOUDINARY_API_KEY": "779618539982762",
+        "CLOUDINARY_API_SECRET": "XHsIxg9ArVefXkd8Hq-oYpYZ0z0",
+        "ADMIN_EMAIL": "lorenzo.lione@gmail.com",
+        "ADMIN_NAME": "Lorenzo Lione",
+        "JWT_SECRET_KEY": "L0acuKoynyX9lVFvbl0rC9CK6ZlUho4OojK3Yg0RRsx4",
+        "JWT_EXPIRATION_TIME": "86400000"
+      }
+    }
+  ]
+}

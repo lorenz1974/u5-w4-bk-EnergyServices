@@ -1,0 +1,10 @@
+{
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "java.dependency.packagePresentation": "hierarchical",
+  "java.project.explorer.showNonJavaResources": true,
+
+  "task.autoDetect": "on",
+  "tasks.autoRun": "Start PostgreSQL Container",
+  "java.debug.settings.onBuildFailureProceed": true
+}
