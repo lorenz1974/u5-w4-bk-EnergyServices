@@ -6,16 +6,18 @@ import bw5.energyservices.dto.ClientRequestDTO;
 import bw5.energyservices.response.ClientResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
+
 public class ClientService {
 
-    private final ClientRepository clientRepository;
+    @Autowired
+    private ClientRepository clientRepository;
 
     public ResponseEntity<String> createClient(ClientRequestDTO clientRequestDTO) {
 
