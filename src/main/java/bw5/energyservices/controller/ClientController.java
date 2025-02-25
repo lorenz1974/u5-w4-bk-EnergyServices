@@ -1,20 +1,23 @@
 package bw5.energyservices.controller;
 
 import bw5.energyservices.model.Client;
-import bw5.energyservices.model.Invoice;
+import bw5.energyservices.repository.ClientRepository;
 import bw5.energyservices.request.ClientRequest;
 import bw5.energyservices.response.ClientResponse;
-import bw5.energyservices.response.IdResponse;
 import bw5.energyservices.response.InvoiceResponseNoClient;
+import bw5.energyservices.response.PaginatedClientResponse;
 import bw5.energyservices.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/clients")
@@ -23,11 +26,17 @@ import java.util.List;
 public class ClientController {
 
     private final ClientService clientService;
+    private final ClientRepository clientRepository;
 
-    @GetMapping
+    @GetMapping("/{currentPage}/{size}/{sortBy}")
     @ResponseStatus(HttpStatus.OK)
-    public List<ClientResponse> getAllClients() {
-        return clientService.getAllClients();
+    public PaginatedClientResponse<ClientResponse> getAllClients(@RequestParam (defaultValue = "0")int currentPage, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "id") String sortBy) {
+        Page<Client> clients = clientRepository.findAll(PageRequest.of(currentPage, size, Sort.by(sortBy)));
+
+        List<ClientResponse> clientResponses = clients.getContent().stream()
+                .map(client -> new ClientResponse(client)).collect(Collectors.toList());
+
+        return new PaginatedClientResponse<>(clientResponses, clients.getTotalPages(), clients.getTotalElements(), currentPage, size);
     }
 
     @PostMapping
