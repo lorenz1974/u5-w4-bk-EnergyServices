@@ -12,7 +12,10 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -21,6 +24,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 public class ClientService {
 
     private final ClientRepository clientRepository;
@@ -95,6 +99,20 @@ public class ClientService {
         // Aggiungo la nuova lista di fatture al client
         client.setInvoices((List<Invoice>) invoicesNoClientDetails);
         return client;
+    }
+
+    //metodo per la ricerca tramite query
+    public Page<Client> searchByQuery(String query, Pageable pageable) {
+        if (query == null || query.isEmpty()) {
+            throw new IllegalArgumentException("Query cannot be empty");
+        }
+
+        Page<Client> result = clientRepository.searchByQuery(query, pageable);
+
+        if (result.isEmpty()) {
+            log.info("No results found for query: {}", query);
+        }
+        return result;
     }
 
     // metodi aggiuntivi
