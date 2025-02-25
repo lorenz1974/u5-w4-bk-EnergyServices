@@ -33,6 +33,7 @@ public class InvoiceController {
     }
 
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public InvoiceResponse updateInvoice(@PathVariable Long id,
             @Valid @RequestBody InvoiceRequest invoiceRequest) {
         InvoiceResponse response = invoiceService.updateInvoice(id, invoiceRequest);
@@ -40,6 +41,7 @@ public class InvoiceController {
     }
 
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public Invoice getInvoice(@PathVariable Long id) {
         return invoiceService.getInvoice(id);
     }

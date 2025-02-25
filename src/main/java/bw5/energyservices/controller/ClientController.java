@@ -5,6 +5,7 @@ import bw5.energyservices.model.Invoice;
 import bw5.energyservices.request.ClientRequest;
 import bw5.energyservices.response.ClientResponse;
 import bw5.energyservices.response.IdResponse;
+import bw5.energyservices.response.InvoiceResponseNoClient;
 import bw5.energyservices.service.ClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public ClientResponse updateClient(@PathVariable Long id,
             @Valid @RequestBody ClientRequest clientRequestDTO) {
         ClientResponse response = clientService.updateClient(id, clientRequestDTO);
@@ -44,15 +46,18 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     // Rispondo con client in modo da avere anche tutti i dati delle fatture
     public Client getClient(@PathVariable Long id) {
         return clientService.getClient(id);
     }
 
     @GetMapping("/{id}/invoices")
+    @ResponseStatus(HttpStatus.OK)
     // Rispondo con le fatture del client per avere tutti i dati
-    public List<Invoice> getClientInvoices(@PathVariable Long id) {
+    public List<InvoiceResponseNoClient> getClientInvoices(@PathVariable Long id) {
         return clientService.getClientInvoices(id);
+
     }
 
     @DeleteMapping("/{id}")

@@ -4,6 +4,8 @@ import bw5.energyservices.model.Invoice;
 import bw5.energyservices.repository.InvoiceRepository;
 import bw5.energyservices.request.InvoiceRequest;
 import bw5.energyservices.response.InvoiceResponse;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -20,6 +22,11 @@ public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
 
     public InvoiceResponse createInvoice(@Valid InvoiceRequest invoiceRequest) {
+
+        if (invoiceRepository.existsByInvoiceNumber(invoiceRequest.getInvoiceNumber())) {
+            throw new EntityExistsException("Invoice number already exists");
+        }
+
         Invoice invoice = new Invoice();
         BeanUtils.copyProperties(invoiceRequest, invoice);
         invoice = invoiceRepository.save(invoice);
@@ -28,7 +35,7 @@ public class InvoiceService {
 
     public InvoiceResponse updateInvoice(Long id, InvoiceRequest invoiceRequest) {
         if (!invoiceRepository.existsById(id)) {
-            throw new IllegalArgumentException("Invoice not found (update)");
+            throw new EntityNotFoundException("Invoice not found (update)");
         }
         Invoice invoice = invoiceRepository.findById(id).get();
         BeanUtils.copyProperties(invoiceRequest, invoice);
@@ -38,7 +45,7 @@ public class InvoiceService {
 
     public void deleteInvoice(Long id) {
         if (!invoiceRepository.existsById(id)) {
-            throw new IllegalArgumentException("Invoice not found (delete)");
+            throw new EntityNotFoundException("Invoice not found (delete)");
         }
         invoiceRepository.deleteById(id);
     }
@@ -59,6 +66,6 @@ public class InvoiceService {
 
     public Invoice getInvoice(Long id) {
         return invoiceRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invoice not found (get)"));
+                .orElseThrow(() -> new EntityNotFoundException("Invoice not found (get)"));
     }
 }

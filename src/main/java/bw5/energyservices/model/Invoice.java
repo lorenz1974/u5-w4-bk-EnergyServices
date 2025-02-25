@@ -31,7 +31,7 @@ public class Invoice {
     @Column(nullable = false)
     private LocalDate invoiceDate;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @Size(min = 6, max = 10)
     private String invoiceNumber;
 

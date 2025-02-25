@@ -6,6 +6,9 @@ import bw5.energyservices.repository.ClientRepository;
 import bw5.energyservices.request.ClientRequest;
 import bw5.energyservices.response.ClientResponse;
 import bw5.energyservices.response.IdResponse;
+import bw5.energyservices.response.InvoiceResponseNoClient;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -25,12 +28,12 @@ public class ClientService {
 
         // Verifica che non esista il nome della compagnia
         if (clientRepository.existsByCompanyName(clientRequestDTO.getCompanyName())) {
-            throw new IllegalArgumentException("Company name already exists");
+            throw new EntityExistsException("Company name already exists");
         }
 
         // Verifica che non esista il numero di partita IVA
         if (clientRepository.existsByVatNumber(clientRequestDTO.getVatNumber())) {
-            throw new IllegalArgumentException("Vat number already exists");
+            throw new EntityExistsException("Vat number already exists");
         }
 
         Client client = new Client();
@@ -43,7 +46,7 @@ public class ClientService {
 
     public ClientResponse updateClient(Long id, ClientRequest clientRequestDTO) {
         if (!clientRepository.existsById(id)) {
-            throw new IllegalArgumentException("Client not found (update)");
+            throw new EntityNotFoundException("Client not found (update)");
         }
         Client client = clientRepository.findById(id).get();
         BeanUtils.copyProperties(clientRequestDTO, client);
@@ -53,7 +56,7 @@ public class ClientService {
 
     public void deleteClient(Long id) {
         if (!clientRepository.existsById(id)) {
-            throw new IllegalArgumentException("Client not found (delete)");
+            throw new EntityNotFoundException("Client not found (delete)");
         }
         clientRepository.deleteById(id);
     }
@@ -63,11 +66,20 @@ public class ClientService {
         return responseFromEntityList(clientRepository.findAll());
     }
 
-    public List<Invoice> getClientInvoices(Long id) {
+    public List<InvoiceResponseNoClient> getClientInvoices(Long id) {
         if (!clientRepository.existsById(id)) {
-            throw new IllegalArgumentException("Client not found (get invoices)");
+            throw new EntityNotFoundException("Client not found (get invoices)");
         }
-        return getClient(id).getInvoices();
+        // Cancello le informazioni del cliente sulle fatture perch*é è ridondante in
+        // questo caso
+        return getClient(id).getInvoices().stream()
+                .map(invoice -> new InvoiceResponseNoClient(invoice.getId(), invoice.getInvoiceNumber(),
+                        invoice.getInvoiceDate(), invoice.getInvoiceStatus()))
+                .toList();
+    }
+
+    public Client getClient(Long id) {
+        return clientRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Client not found (get)"));
     }
 
     // metodi aggiuntivi
@@ -82,8 +94,4 @@ public class ClientService {
         return clients.stream().map(this::responseFromEntity).toList();
     }
 
-    // Rispondo con Client in modo da avere anche tutti i dati relativi alle fatture
-    public Client getClient(Long id) {
-        return clientRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Client not found (get)"));
-    }
 }
