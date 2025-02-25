@@ -78,6 +78,10 @@ public class ClientService {
                 .toList();
     }
 
+    //
+    // Deve essere creato un DTO che non ridondi le informazioni del cliente dentro
+    // ogni fattura
+    //
     public Client getClient(Long id) {
         return clientRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Client not found (get)"));
     }
