@@ -52,6 +52,14 @@ public class Client {
 
     private String companyLogo;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "main_address_id", referencedColumnName = "id")
+    private Address mainAddress;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "operational_address_id", referencedColumnName = "id")
+    private Address operationalAddress;
+
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     @OrderBy("invoiceNumber ASC")
     private List<Invoice> invoices;
