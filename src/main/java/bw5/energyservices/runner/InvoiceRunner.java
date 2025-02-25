@@ -45,7 +45,7 @@ public class InvoiceRunner implements CommandLineRunner {
 
         log.info("Invoice statuses created.");
 
-        log.info("Creating 150 invoices...");
+        log.info("Creating 250 invoices...");
         // Cerca il numero dei clienti nel DB
         long clientCount = clientRepository.count();
         log.debug("Clients count: {}", clientCount);
@@ -59,7 +59,7 @@ public class InvoiceRunner implements CommandLineRunner {
         log.debug("Invoice statuses count: {}", invoiceStatusCount);
 
         // Crea 50 fatture
-        for (int i = 0; i < 150; i++) {
+        for (int i = 0; i < 250; i++) {
 
             //
             // La fattura viene creata con una data successiva alla precedente di massimo

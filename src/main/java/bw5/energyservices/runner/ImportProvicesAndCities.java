@@ -14,8 +14,8 @@ import bw5.energyservices.service.CsvImporter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-//@Order(1)
-//@Component
+@Order(1)
+@Component
 @RequiredArgsConstructor
 @Slf4j
 public class ImportProvicesAndCities implements CommandLineRunner {
