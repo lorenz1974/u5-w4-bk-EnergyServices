@@ -101,20 +101,6 @@ public class ClientService {
         return client;
     }
 
-    //metodo per la ricerca tramite query
-    public Page<Client> searchByQuery(String query, Pageable pageable) {
-        if (query == null || query.isEmpty()) {
-            throw new IllegalArgumentException("Query cannot be empty");
-        }
-
-        Page<Client> result = clientRepository.omniSearch(query, pageable);
-
-        if (result.isEmpty()) {
-            log.info("No results found for query: {}", query);
-        }
-        return result;
-    }
-
     // metodi aggiuntivi
     public ClientResponse responseFromEntity(Client client) {
         ClientResponse response = new ClientResponse();

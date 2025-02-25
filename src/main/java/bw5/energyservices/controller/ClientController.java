@@ -86,14 +86,4 @@ public class ClientController {
         clientService.deleteClient(id);
     }
 
-    //endpoint per la ricerca tramite query
-    @GetMapping("/q")
-    @ResponseStatus(HttpStatus.OK)
-    public Page<Client> searchByQuery(@RequestParam String query, @RequestParam(defaultValue = "0" ) int page, @RequestParam(defaultValue = "10" ) int size, @RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "asc" ) String sortDirection) {
-
-        Sort.Direction direction = Sort.Direction.fromString(sortDirection);
-        PageRequest pageRequest = PageRequest.of(page, size, direction, sortBy);
-
-        return clientService.searchByQuery(query, pageRequest);
-    }
 }
