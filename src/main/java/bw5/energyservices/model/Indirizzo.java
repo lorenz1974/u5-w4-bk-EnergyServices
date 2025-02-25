@@ -11,7 +11,7 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString
-@Table(name = "indirizzo")
+@Table(name = "indirizzi")
 public class Indirizzo {
     @Id
     @GeneratedValue
