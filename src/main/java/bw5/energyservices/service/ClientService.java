@@ -107,7 +107,7 @@ public class ClientService {
             throw new IllegalArgumentException("Query cannot be empty");
         }
 
-        Page<Client> result = clientRepository.searchByQuery(query, pageable);
+        Page<Client> result = clientRepository.omniSearch(query, pageable);
 
         if (result.isEmpty()) {
             log.info("No results found for query: {}", query);
