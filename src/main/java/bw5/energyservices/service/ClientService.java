@@ -4,49 +4,65 @@ import bw5.energyservices.model.Client;
 import bw5.energyservices.repository.ClientRepository;
 import bw5.energyservices.dto.ClientRequestDTO;
 import bw5.energyservices.response.ClientResponse;
+import bw5.energyservices.response.IdResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 @Service
-
+@RequiredArgsConstructor
+@Validated
 public class ClientService {
 
-    @Autowired
-    private ClientRepository clientRepository;
+    private final ClientRepository clientRepository;
 
-    public ResponseEntity<String> createClient(ClientRequestDTO clientRequestDTO) {
+    public ClientResponse createClient(@Valid ClientRequestDTO clientRequestDTO) {
+
+        // Verifica che non esista il nome della compagnia
+        if (clientRepository.existsByCompanyName(clientRequestDTO.getCompanyName())) {
+            throw new IllegalArgumentException("Company name already exists");
+        }
+
+        // Verifica che non esista il numero di partita IVA
+        if (clientRepository.existsByVatNumber(clientRequestDTO.getVatNumber())) {
+            throw new IllegalArgumentException("Vat number already exists");
+        }
 
         Client client = new Client();
         BeanUtils.copyProperties(clientRequestDTO, client);
-        clientRepository.save(client);
-        return ResponseEntity.ok("Client created successfully");
+        client = clientRepository.save(client);
 
+        return responseFromEntity(client);
 
     }
 
-    public ResponseEntity<String> updateClient(Long id, ClientRequestDTO clientRequestDTO) {
-        Client client = new Client();
+    public ClientResponse updateClient(Long id, ClientRequestDTO clientRequestDTO) {
+        if (!clientRepository.existsById(id)) {
+            throw new IllegalArgumentException("Client not found (update)");
+        }
+        Client client = clientRepository.findById(id).get();
         BeanUtils.copyProperties(clientRequestDTO, client);
-        clientRepository.save(client);
-        return ResponseEntity.ok("Client updated successfully");
+        client = clientRepository.save(client);
+        return responseFromEntity(client);
     }
 
-    public ResponseEntity<String> deleteClient(Long id) {
+    public void deleteClient(Long id) {
+        if (!clientRepository.existsById(id)) {
+            throw new IllegalArgumentException("Client not found (delete)");
+        }
         clientRepository.deleteById(id);
-        return ResponseEntity.ok("Client deleted successfully");
     }
 
-    //metodo GET per tutte le clientResponse
+    // metodo GET per tutte le clientResponse
     public List<ClientResponse> getAllClients() {
-        return responseromEntityList(clientRepository.findAll());
+        return responseFromEntityList(clientRepository.findAll());
     }
 
-    //metodi aggiuntivi
+    // metodi aggiuntivi
     public ClientResponse responseFromEntity(Client client) {
         ClientResponse response = new ClientResponse();
         BeanUtils.copyProperties(client, response);
@@ -54,7 +70,12 @@ public class ClientService {
 
     }
 
-    public List<ClientResponse> responseromEntityList(List<Client> clients) {
+    public List<ClientResponse> responseFromEntityList(List<Client> clients) {
         return clients.stream().map(this::responseFromEntity).toList();
+    }
+
+    // Rispondo con Client in modo da avere anche tutti i dati relativi alle fatture
+    public Client getClient(Long id) {
+        return clientRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Client not found (get)"));
     }
 }

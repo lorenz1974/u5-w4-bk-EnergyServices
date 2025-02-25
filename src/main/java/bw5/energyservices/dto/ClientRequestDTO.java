@@ -2,6 +2,7 @@ package bw5.energyservices.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,41 +16,45 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class ClientRequestDTO {
 
-    @NotNull
-    @Size(min = 2, max = 100)
+    @NotNull(message = "Company name cannot be null")
+    @Size(min = 2, max = 100, message = "Company name must be between 2 and 100 characters")
     private String companyName;
 
-    @NotNull
-    @Size(min = 11, max = 11)
+    @NotNull(message = "VAT number cannot be null")
+    @Size(min = 11, max = 11, message = "VAT number must be exactly 11 characters")
     private String vatNumber;
 
-    @Email
-    @NotNull
-    @Size(min = 5, max = 100)
+    @Email(message = "Email should be valid")
+    @NotNull(message = "Email cannot be null")
+    @Size(min = 5, max = 100, message = "Email must be between 5 and 100 characters")
     private String email;
 
-    @NotNull
+    @NotNull(message = "Last contact date cannot be null")
+    @PastOrPresent(message = "Last contact date must be in the past or present")
     private LocalDate lastContactDate;
 
-    @NotNull
+    @NotNull(message = "Annual revenue cannot be null")
     private BigDecimal annualRevenue;
 
-    @NotNull
+    @NotNull(message = "Phone cannot be null")
+    @Size(min = 10, max = 15, message = "Phone number must be between 10 and 15 characters")
     private String phone;
 
-    @NotNull
+    @Email(message = "Contact email should be valid")
+    @NotNull(message = "Contact email cannot be null")
     private String contactEmail;
 
-    @NotNull
+    @NotNull(message = "Contact first name cannot be null")
     private String contactFirstName;
 
-    @NotNull
+    @NotNull(message = "Contact last name cannot be null")
     private String contactLastName;
 
-    @NotNull
+    @NotNull(message = "Contact phone cannot be null")
+    @Size(min = 10, max = 15, message = "Phone number must be between 10 and 15 characters")
     private String contactPhone;
 
-    @NotNull
+    @NotNull(message = "Company logo cannot be null")
     private String companyLogo;
 
 }

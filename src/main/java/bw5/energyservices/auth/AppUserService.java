@@ -3,7 +3,6 @@ package bw5.energyservices.auth;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,7 +18,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AppUserService {
 
-   final private AppUserRepository appUserRepository;
+    final private AppUserRepository appUserRepository;
 
     final private PasswordEncoder passwordEncoder;
 
@@ -27,7 +26,8 @@ public class AppUserService {
 
     final private JwtTokenUtil jwtTokenUtil;
 
-    public AppUser registerUser(String username, String password, String firstName, String lastName, String email, Set<Role> roles) {
+    public AppUser registerUser(String username, String password, String firstName, String lastName, String email,
+            Set<Role> roles) {
         // Check if the username already exists
         if (appUserRepository.existsByUsername(username)) {
             throw new EntityExistsException("Username già in uso");
@@ -51,16 +51,14 @@ public class AppUserService {
         return appUserRepository.save(appUser);
     }
 
-
     public Optional<AppUser> findByUsername(String username) {
         return appUserRepository.findByUsername(username);
     }
 
-    public String authenticateUser(String username, String password)  {
+    public String authenticateUser(String username, String password) {
         try {
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password)
-            );
+                    new UsernamePasswordAuthenticationToken(username, password));
 
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             return jwtTokenUtil.generateToken(userDetails);
@@ -69,11 +67,9 @@ public class AppUserService {
         }
     }
 
-
-    public AppUser loadUserByUsername(String username)  {
+    public AppUser loadUserByUsername(String username) {
         AppUser appUser = appUserRepository.findByUsername(username)
-            .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con username: " + username));
-
+                .orElseThrow(() -> new EntityNotFoundException("Utente non trovato con username: " + username));
 
         return appUser;
     }
@@ -87,7 +83,6 @@ public class AppUserService {
         if (appUserRepository.findByEmail(appUser.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already in use");
         }
-
 
         String encodedPassword = passwordEncoder.encode(appUser.getPassword());
         appUser.setPassword(encodedPassword);

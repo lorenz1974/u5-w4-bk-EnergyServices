@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Table(name = "clients")
@@ -30,7 +33,8 @@ public class Client {
     @Column(nullable = false, unique = true)
     private String email;
 
-    private LocalDate insertionDate = LocalDate.now();
+    @CreatedDate
+    private LocalDate insertionDate;
 
     private LocalDate lastContactDate;
 
@@ -50,9 +54,10 @@ public class Client {
 
     private String companyLogo;
 
-//    @Embedded
-//    private Address address;
-//
-//    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Invoice> invoices;
+    // @Embedded
+    // private Address address;
+    //
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    @OrderBy("invoiceNumber ASC")
+    private List<Invoice> invoices;
 }
