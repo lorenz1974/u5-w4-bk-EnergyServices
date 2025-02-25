@@ -2,7 +2,7 @@ package bw5.energyservices.service;
 
 import bw5.energyservices.model.Client;
 import bw5.energyservices.repository.ClientRepository;
-import bw5.energyservices.dto.ClientRequestDTO;
+import bw5.energyservices.request.ClientRequest;
 import bw5.energyservices.response.ClientResponse;
 import bw5.energyservices.response.IdResponse;
 import jakarta.validation.Valid;
@@ -20,7 +20,7 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
 
-    public ClientResponse createClient(@Valid ClientRequestDTO clientRequestDTO) {
+    public ClientResponse createClient(@Valid ClientRequest clientRequestDTO) {
 
         // Verifica che non esista il nome della compagnia
         if (clientRepository.existsByCompanyName(clientRequestDTO.getCompanyName())) {
@@ -40,7 +40,7 @@ public class ClientService {
 
     }
 
-    public ClientResponse updateClient(Long id, ClientRequestDTO clientRequestDTO) {
+    public ClientResponse updateClient(Long id, ClientRequest clientRequestDTO) {
         if (!clientRepository.existsById(id)) {
             throw new IllegalArgumentException("Client not found (update)");
         }

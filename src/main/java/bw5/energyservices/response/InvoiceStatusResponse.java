@@ -1,4 +1,4 @@
-package bw5.energyservices.dto;
+package bw5.energyservices.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

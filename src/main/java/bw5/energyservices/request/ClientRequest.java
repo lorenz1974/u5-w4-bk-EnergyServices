@@ -1,4 +1,4 @@
-package bw5.energyservices.dto;
+package bw5.energyservices.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClientRequestDTO {
+public class ClientRequest {
 
     @NotNull(message = "Company name cannot be null")
     @Size(min = 2, max = 100, message = "Company name must be between 2 and 100 characters")

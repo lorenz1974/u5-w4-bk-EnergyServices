@@ -1,7 +1,7 @@
 package bw5.energyservices.controller;
 
-import bw5.energyservices.dto.ClientRequestDTO;
 import bw5.energyservices.model.Client;
+import bw5.energyservices.request.ClientRequest;
 import bw5.energyservices.response.ClientResponse;
 import bw5.energyservices.response.IdResponse;
 import bw5.energyservices.service.ClientService;
@@ -31,13 +31,13 @@ public class ClientController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     // @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ClientResponse createClient(@Valid @RequestBody ClientRequestDTO clientRequestDTO) {
+    public ClientResponse createClient(@Valid @RequestBody ClientRequest clientRequestDTO) {
         return clientService.createClient(clientRequestDTO);
     }
 
     @PutMapping("/{id}")
     public ClientResponse updateClient(@PathVariable Long id,
-            @Valid @RequestBody ClientRequestDTO clientRequestDTO) {
+            @Valid @RequestBody ClientRequest clientRequestDTO) {
         ClientResponse response = clientService.updateClient(id, clientRequestDTO);
         return response;
     }
