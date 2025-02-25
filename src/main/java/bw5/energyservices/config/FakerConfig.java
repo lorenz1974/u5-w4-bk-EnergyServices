@@ -9,7 +9,7 @@ import java.util.Locale;
 @Configuration
 public class FakerConfig {
     @Bean
-            public Faker faker() {
+    public Faker faker() {
         return new Faker(Locale.ITALIAN);
     }
 }

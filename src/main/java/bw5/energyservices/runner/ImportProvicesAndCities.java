@@ -1,7 +1,6 @@
 package bw5.energyservices.runner;
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -16,48 +15,51 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Order(1)
-@Component
+// @Component
 @RequiredArgsConstructor
 @Slf4j
 public class ImportProvicesAndCities implements CommandLineRunner {
 
-    private final CsvImporter csvImporter;
-    private final CityCompleteRepository cityCompleteRepository;
+        private final CsvImporter csvImporter;
+        private final CityCompleteRepository cityCompleteRepository;
 
-    @Override
-    public void run(String... args) throws Exception {
-        List<Province> provinces = csvImporter.importCsv(
-                "src\\main\\java\\bw5\\energyservices\\comuni-province\\province-italiane.csv", Province.class);
-        List<City> cities = csvImporter
-                .importCsv("src\\main\\java\\bw5\\energyservices\\comuni-province\\comuni-italiani.csv",
-                        City.class);
+        @Override
+        public void run(String... args) throws Exception {
+                List<Province> provinces = csvImporter.importCsv(
+                                "src\\main\\java\\bw5\\energyservices\\comuni-province\\province-italiane.csv",
+                                Province.class);
+                List<City> cities = csvImporter
+                                .importCsv("src\\main\\java\\bw5\\energyservices\\comuni-province\\comuni-italiani.csv",
+                                                City.class);
 
-        log.info("Import provinces and cities...");
+                log.info("Import provinces and cities...");
 
-        log.info("Provinces: {}", provinces.size());
-        log.debug("Provinces: {}", provinces.toString());
+                log.info("Provinces: {}", provinces.size());
+                log.debug("Provinces: {}", provinces.toString());
 
-        log.info("Cities: {}", cities.size());
-        log.debug("Cities: {}", cities.toString());
+                log.info("Cities: {}", cities.size());
+                log.debug("Cities: {}", cities.toString());
 
-        for (City city : cities) {
+                for (City city : cities) {
 
-            CityComplete cityComplete = new CityComplete();
-            cityComplete.setProvinceProgressive(city.getProvinceCode());
-            cityComplete.setCityProgressive(city.getCityCode());
-            cityComplete.setName(city.getName());
-            cityComplete.setProvince(city.getProvinceName());
+                        CityComplete cityComplete = new CityComplete();
+                        cityComplete.setProvinceProgressive(city.getProvinceCode());
+                        cityComplete.setCityProgressive(city.getCityCode());
+                        cityComplete.setName(city.getName());
+                        cityComplete.setProvince(city.getProvinceName());
 
-            cityComplete.setProvinceCode(provinces.stream().filter(p -> p.getName().equals(city.getProvinceName()))
-                    .findFirst().map(Province::getCode).orElse(null));
+                        cityComplete.setProvinceCode(
+                                        provinces.stream().filter(p -> p.getName().equals(city.getProvinceName()))
+                                                        .findFirst().map(Province::getCode).orElse(null));
 
-            cityComplete.setRegion(provinces.stream().filter(p -> p.getName().equals(city.getProvinceName()))
-                    .findFirst().map(Province::getRegion).orElse(null));
+                        cityComplete.setRegion(
+                                        provinces.stream().filter(p -> p.getName().equals(city.getProvinceName()))
+                                                        .findFirst().map(Province::getRegion).orElse(null));
 
-            cityCompleteRepository.save(cityComplete);
+                        cityCompleteRepository.save(cityComplete);
+                }
+
+                log.info("Done!");
+
         }
-
-        log.info("Done!");
-
-    }
 }
