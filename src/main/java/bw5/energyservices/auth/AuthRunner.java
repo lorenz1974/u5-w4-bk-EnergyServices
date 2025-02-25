@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
@@ -21,12 +22,19 @@ public class AuthRunner implements ApplicationRunner {
     Faker faker = new Faker();
 
     final private AppUserService appUserService;
-
     final private PasswordEncoder passwordEncoder;
+    @Value("${spring.jpa.hibernate.ddl-auto}")
+    private String ddlAuto;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
+        // Check if table creation is needed
+        log.info("*** spring.jpa.hibernate.ddl-auto set to '{}'. {}", ddlAuto,
+                ddlAuto.equals("none") ? "Skipping records creation..." : "Creating records...");
+        if (ddlAuto.equals("none")) {
+            return;
+        }
         log.info("Creazione SuperAdmin...");
         AppUser superAdmin = new AppUser();
 
