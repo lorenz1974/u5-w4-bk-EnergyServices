@@ -9,6 +9,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
 @Slf4j
-public class ExceptionHandlerClass {
+public class ExceptionHandlerClass extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ExceptionMessage> handleIllegalArgumentException(IllegalArgumentException e) {
@@ -30,6 +31,20 @@ public class ExceptionHandlerClass {
 
         log.error("-----------------------------------------------------");
         log.error("IllegalArgumentException: {}", e.getMessage());
+        log.error("-----------------------------------------------------");
+
+        return new ResponseEntity<>(exceptionMessage, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ExceptionMessage> handleIllegalStateException(IllegalStateException e) {
+        ExceptionMessage exceptionMessage = new ExceptionMessage();
+        exceptionMessage.setMessage(e.getMessage());
+        exceptionMessage.setStatus("400");
+        exceptionMessage.setError("Bad Request");
+
+        log.error("-----------------------------------------------------");
+        log.error("IllegalStateException: {}", e.getMessage());
         log.error("-----------------------------------------------------");
 
         return new ResponseEntity<>(exceptionMessage, HttpStatus.BAD_REQUEST);

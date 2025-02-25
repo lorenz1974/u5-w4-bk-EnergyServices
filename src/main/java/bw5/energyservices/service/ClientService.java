@@ -4,10 +4,10 @@ import bw5.energyservices.model.Client;
 import bw5.energyservices.model.Invoice;
 import bw5.energyservices.repository.ClientRepository;
 import bw5.energyservices.request.ClientRequest;
+import bw5.energyservices.response.ClientNoInvoiceDetailsResponse;
 import bw5.energyservices.response.ClientResponse;
-import bw5.energyservices.response.IdResponse;
-import bw5.energyservices.response.InvoiceResponseNoClient;
-import bw5.energyservices.response.InvoiceResponseNoClientDetails;
+import bw5.energyservices.response.InvoiceResponse;
+import bw5.energyservices.response.PaginatedClientResponse;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -15,11 +15,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +32,10 @@ public class ClientService {
     private final ClientRepository clientRepository;
 
     public ClientResponse createClient(@Valid ClientRequest clientRequestDTO) {
-
         // Verifica che non esista il nome della compagnia
         if (clientRepository.existsByCompanyName(clientRequestDTO.getCompanyName())) {
             throw new EntityExistsException("Company name already exists");
         }
-
         // Verifica che non esista il numero di partita IVA
         if (clientRepository.existsByVatNumber(clientRequestDTO.getVatNumber())) {
             throw new EntityExistsException("Vat number already exists");
@@ -46,14 +46,11 @@ public class ClientService {
         client = clientRepository.save(client);
 
         return responseFromEntity(client);
-
     }
 
     public ClientResponse updateClient(Long id, ClientRequest clientRequestDTO) {
-        if (!clientRepository.existsById(id)) {
-            throw new EntityNotFoundException("Client not found (update)");
-        }
-        Client client = clientRepository.findById(id).get();
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Client not found (update)"));
         BeanUtils.copyProperties(clientRequestDTO, client);
         client = clientRepository.save(client);
         return responseFromEntity(client);
@@ -66,51 +63,56 @@ public class ClientService {
         clientRepository.deleteById(id);
     }
 
-    // metodo GET per tutte le clientResponse
-    public List<ClientResponse> getAllClients() {
-        return responseFromEntityList(clientRepository.findAll());
-    }
-
-    public List<InvoiceResponseNoClient> getClientInvoices(Long id) {
-        if (!clientRepository.existsById(id)) {
-            throw new EntityNotFoundException("Client not found (get invoices)");
+    public PaginatedClientResponse<ClientResponse> getAllClients(int currentPage, int size, String sortBy, String q) {
+        Page<Client> clients;
+        PageRequest pageRequest = PageRequest.of(currentPage, size, Sort.by(sortBy));
+        if (q == null || q.isEmpty()) {
+            clients = clientRepository.findAll(pageRequest);
+        } else {
+            String qLower = q.toLowerCase();
+            clients = clientRepository.omniSearch(qLower, pageRequest);
         }
-        // Cancello le informazioni del cliente sulle fatture perch*é è ridondante in
-        // questo caso
-        return getClient(id).getInvoices().stream()
-                .map(invoice -> new InvoiceResponseNoClient(invoice.getId(), invoice.getInvoiceNumber(),
-                        invoice.getInvoiceDate(), invoice.getInvoiceStatus()))
-                .toList();
+
+        List<ClientResponse> clientResponses = clients.getContent().stream()
+                .map(this::responseFromEntity)
+                .collect(Collectors.toList());
+
+        return new PaginatedClientResponse<>(clientResponses, clients.getTotalPages(), clients.getTotalElements(),
+                currentPage, size);
     }
 
-    //
-    // Deve essere creato un DTO che non ridondi le informazioni del cliente dentro
-    // ogni fattura
-    //
-    public Client getClient(Long id) {
-        Client client = clientRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Client not found (get)"));
-
-        //Creo una lista di fatture senza i dati del cliente
-        List<?> invoicesNoClientDetails = client.getInvoices().stream()
-                .map(invoice -> new InvoiceResponseNoClientDetails(invoice.getId(), invoice.getInvoiceNumber(),
-                        invoice.getInvoiceDate(), invoice.getInvoiceStatus(), invoice.getAmount()))
-                .toList();
-
-        // Aggiungo la nuova lista di fatture al client
-        client.setInvoices((List<Invoice>) invoicesNoClientDetails);
-        return client;
+    public List<InvoiceResponse> getClientInvoices(Long id) {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Client not found (get invoices)"));
+        // Rimuovo le informazioni del client dalle fatture per evitare ridondanze
+        return client.getInvoices().stream()
+                .map(invoice -> new InvoiceResponse(invoice))
+                .collect(Collectors.toList());
     }
 
-    // metodi aggiuntivi
+    public ClientNoInvoiceDetailsResponse getClient(Long id) {
+        Client client = clientRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Client not found (get)"));
+        // Se presente, rimuovo il riferimento al client nelle fatture per evitare
+        // riferimenti circolari
+        if (client.getInvoices() != null) {
+            client.getInvoices().forEach(invoice -> invoice.setClient(null));
+        }
+        ClientNoInvoiceDetailsResponse response = new ClientNoInvoiceDetailsResponse();
+        BeanUtils.copyProperties(client, response);
+        return response;
+    }
+
+    // Metodi di conversione
     public ClientResponse responseFromEntity(Client client) {
         ClientResponse response = new ClientResponse();
         BeanUtils.copyProperties(client, response);
         return response;
-
     }
 
     public List<ClientResponse> responseFromEntityList(List<Client> clients) {
-        return clients.stream().map(this::responseFromEntity).toList();
+        return clients.stream()
+                .map(this::responseFromEntity)
+                .collect(Collectors.toList());
     }
-
 }
