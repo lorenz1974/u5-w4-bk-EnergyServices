@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CityCompleteRepository extends JpaRepository<CityComplete, Long> {
 
+    CityComplete findByProvinceCode(String code);
 }
