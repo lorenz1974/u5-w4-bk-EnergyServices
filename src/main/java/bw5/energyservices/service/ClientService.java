@@ -7,6 +7,7 @@ import bw5.energyservices.request.ClientRequest;
 import bw5.energyservices.response.ClientResponse;
 import bw5.energyservices.response.IdResponse;
 import bw5.energyservices.response.InvoiceResponseNoClient;
+import bw5.energyservices.response.InvoiceResponseNoClientDetails;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -83,7 +84,17 @@ public class ClientService {
     // ogni fattura
     //
     public Client getClient(Long id) {
-        return clientRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Client not found (get)"));
+        Client client = clientRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Client not found (get)"));
+
+        //Creo una lista di fatture senza i dati del cliente
+        List<?> invoicesNoClientDetails = client.getInvoices().stream()
+                .map(invoice -> new InvoiceResponseNoClientDetails(invoice.getId(), invoice.getInvoiceNumber(),
+                        invoice.getInvoiceDate(), invoice.getInvoiceStatus(), invoice.getAmount()))
+                .toList();
+
+        // Aggiungo la nuova lista di fatture al client
+        client.setInvoices((List<Invoice>) invoicesNoClientDetails);
+        return client;
     }
 
     // metodi aggiuntivi
