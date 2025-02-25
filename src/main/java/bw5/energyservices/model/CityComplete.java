@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "cities")
-public class CityComplete {
+public class CityComplete extends City {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
