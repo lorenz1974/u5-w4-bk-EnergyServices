@@ -1,6 +1,7 @@
 package bw5.energyservices.service;
 
 import bw5.energyservices.model.Client;
+import bw5.energyservices.model.Invoice;
 import bw5.energyservices.repository.ClientRepository;
 import bw5.energyservices.request.ClientRequest;
 import bw5.energyservices.response.ClientResponse;
@@ -60,6 +61,13 @@ public class ClientService {
     // metodo GET per tutte le clientResponse
     public List<ClientResponse> getAllClients() {
         return responseFromEntityList(clientRepository.findAll());
+    }
+
+    public List<Invoice> getClientInvoices(Long id) {
+        if (!clientRepository.existsById(id)) {
+            throw new IllegalArgumentException("Client not found (get invoices)");
+        }
+        return getClient(id).getInvoices();
     }
 
     // metodi aggiuntivi

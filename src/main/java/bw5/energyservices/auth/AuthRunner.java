@@ -4,14 +4,12 @@ import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
 import java.util.Set;
 
 @Component
@@ -49,8 +47,15 @@ public class AuthRunner implements ApplicationRunner {
             appUser.setLastName(faker.name().lastName());
             appUser.setUsername(faker.name().lastName());
             appUser.setRoles(Set.of(Role.ROLE_ADMIN));
+            try {
+                appUserService.registerUser(appUser);
+                log.debug("Admin user {} created successfully.", appUser.getUsername());
+            } catch (IllegalArgumentException e) {
+                log.error("IllegalArgumentException: {}", e.getMessage());
+            } catch (Exception e) {
+                log.error("Exception: {}", e.getMessage());
+            }
 
-            appUserService.registerUser(appUser);
         }
         log.info("Admin users created successfully.");
 
@@ -65,7 +70,14 @@ public class AuthRunner implements ApplicationRunner {
             appUser.setUsername(faker.name().lastName());
             appUser.setRoles(Set.of(Role.ROLE_USER));
 
-            appUserService.registerUser(appUser);
+            try {
+                appUserService.registerUser(appUser);
+                log.debug("App User {} created successfully.", appUser.getUsername());
+            } catch (IllegalArgumentException e) {
+                log.error("IllegalArgumentException: {}", e.getMessage());
+            } catch (Exception e) {
+                log.error("Exception: {}", e.getMessage());
+            }
         }
         log.info("User users created successfully.");
     }

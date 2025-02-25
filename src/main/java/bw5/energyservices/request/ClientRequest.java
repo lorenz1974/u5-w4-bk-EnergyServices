@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -29,15 +29,14 @@ public class ClientRequest {
     @Size(min = 5, max = 100, message = "Email must be between 5 and 100 characters")
     private String email;
 
-    @NotNull(message = "Last contact date cannot be null")
     @PastOrPresent(message = "Last contact date must be in the past or present")
-    private LocalDate lastContactDate;
+    private LocalDateTime lastContactDate;
 
     @NotNull(message = "Annual revenue cannot be null")
     private BigDecimal annualRevenue;
 
     @NotNull(message = "Phone cannot be null")
-    @Size(min = 10, max = 15, message = "Phone number must be between 10 and 15 characters")
+    @Size(min = 5, max = 20, message = "Phone number must be between 5 and 20 characters")
     private String phone;
 
     @Email(message = "Contact email should be valid")
@@ -51,7 +50,7 @@ public class ClientRequest {
     private String contactLastName;
 
     @NotNull(message = "Contact phone cannot be null")
-    @Size(min = 10, max = 15, message = "Phone number must be between 10 and 15 characters")
+    @Size(min = 5, max = 20, message = "Phone number must be between 5 and 20 characters")
     private String contactPhone;
 
     @NotNull(message = "Company logo cannot be null")

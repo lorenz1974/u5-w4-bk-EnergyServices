@@ -1,6 +1,7 @@
 package bw5.energyservices.controller;
 
 import bw5.energyservices.model.Client;
+import bw5.energyservices.model.Invoice;
 import bw5.energyservices.request.ClientRequest;
 import bw5.energyservices.response.ClientResponse;
 import bw5.energyservices.response.IdResponse;
@@ -46,6 +47,12 @@ public class ClientController {
     // Rispondo con client in modo da avere anche tutti i dati delle fatture
     public Client getClient(@PathVariable Long id) {
         return clientService.getClient(id);
+    }
+
+    @GetMapping("/{id}/invoices")
+    // Rispondo con le fatture del client per avere tutti i dati
+    public List<Invoice> getClientInvoices(@PathVariable Long id) {
+        return clientService.getClientInvoices(id);
     }
 
     @DeleteMapping("/{id}")
