@@ -28,15 +28,25 @@ public class ClientController {
     private final ClientService clientService;
     private final ClientRepository clientRepository;
 
-    @GetMapping("/{currentPage}/{size}/{sortBy}")
+    @GetMapping("/")
     @ResponseStatus(HttpStatus.OK)
-    public PaginatedClientResponse<ClientResponse> getAllClients(@RequestParam (defaultValue = "0")int currentPage, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "id") String sortBy) {
-        Page<Client> clients = clientRepository.findAll(PageRequest.of(currentPage, size, Sort.by(sortBy)));
+    public PaginatedClientResponse<ClientResponse> getAllClients(@RequestParam(defaultValue = "0") int currentPage,
+            @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "") String q) {
+        Page<Client> clients;
+        if (q.isEmpty()) {
+            clients = clientRepository.findAll(PageRequest.of(currentPage, size, Sort.by(sortBy)));
+        } else {
+            String qLower = q.toLowerCase();
+            clients = clientRepository.omniSearch(qLower,
+                    PageRequest.of(currentPage, size, Sort.by(sortBy)));
+        }
 
         List<ClientResponse> clientResponses = clients.getContent().stream()
                 .map(client -> new ClientResponse(client)).collect(Collectors.toList());
 
-        return new PaginatedClientResponse<>(clientResponses, clients.getTotalPages(), clients.getTotalElements(), currentPage, size);
+        return new PaginatedClientResponse<>(clientResponses, clients.getTotalPages(), clients.getTotalElements(),
+                currentPage, size);
     }
 
     @PostMapping
