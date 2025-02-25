@@ -2,7 +2,6 @@ package bw5.energyservices.repository;
 
 import bw5.energyservices.model.Client;
 
-import java.util.List;
 import java.util.Optional;
 
 import bw5.energyservices.response.ClientResponse;
@@ -10,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -27,14 +27,7 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     void deleteByVatNumber(String vatNumber);
 
-    @Query("SELECT c FROM Client c WHERE " +
-            "LOWER(c.companyName) = LOWER(:query) OR " +
-            "LOWER(c.vatNumber) = LOWER(:query) OR " +
-            "LOWER(c.email) = LOWER(:query) OR " +
-            "LOWER(c.phone) = LOWER(:query) OR " +
-            "LOWER(c.contactFirstName) = LOWER(:query) OR " +
-            "LOWER(c.contactLastName) = LOWER(:query) OR " +
-            "LOWER(c.contactPhone) = LOWER(:query) OR " +
-            "LOWER(c.contactEmail) = LOWER(:query)")
-    Page<Client> searchByQuery(String query, Pageable pageable);
+    @Query("SELECT c FROM Client c WHERE LOWER(c.companyName) LIKE %:q% OR LOWER(c.vatNumber) LIKE %:q% OR LOWER(c.email) LIKE %:q% OR LOWER(c.certifiedEmail) LIKE %:q% OR LOWER(c.phone) LIKE %:q% OR LOWER(c.contactEmail) LIKE %:q% OR LOWER(c.contactFirstName) LIKE %:q% OR LOWER(c.contactLastName) LIKE %:q% OR LOWER(c.contactPhone) LIKE %:q%")
+    Page<Client> omniSearch(@Param("q") String q, Pageable pageable);
+
 }
