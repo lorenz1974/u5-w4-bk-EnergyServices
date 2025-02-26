@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import bw5.energyservices.model.Address;
 import bw5.energyservices.model.Client;
 import bw5.energyservices.model.Invoice;
-import bw5.energyservices.model.InvoiceSummary;
+import bw5.energyservices.model.ClientInvoicesSummary;
 
 @Data
 @AllArgsConstructor
@@ -53,7 +53,8 @@ public class ClientNoInvoiceDetailsResponse {
     @JsonIgnoreProperties(value = { "client" })
     private List<Invoice> invoices;
 
-    private Map<String, Double> invoiceSummary;
+    private Map<String, Map<String, Object>> invoicesSummary;
+    private Map<Integer, Double> totalRevenueByYear;
 
     public ClientNoInvoiceDetailsResponse(Client client) {
         this.id = client.getId();
@@ -73,6 +74,12 @@ public class ClientNoInvoiceDetailsResponse {
         this.invoices = client.getInvoices();
         this.mainAddress = client.getMainAddress();
         this.operationalAddress = client.getOperationalAddress();
-        this.invoiceSummary = new InvoiceSummary(this.invoices).getInvoiceSummary();
+
+        //
+        // Inserisce i campi calcolati
+        //
+        ClientInvoicesSummary clientInvoicesSummary = new ClientInvoicesSummary(this.invoices);
+        this.invoicesSummary = clientInvoicesSummary.getInvoicesSummary();
+        this.totalRevenueByYear = clientInvoicesSummary.getTotalRevenueByYear();
     }
 }
