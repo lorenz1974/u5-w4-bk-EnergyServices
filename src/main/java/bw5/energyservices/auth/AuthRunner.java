@@ -43,6 +43,7 @@ public class AuthRunner implements ApplicationRunner {
         superAdmin.setUsername("superadmin");
         superAdmin.setEmail("superadmin@esempio.it");
         superAdmin.setPassword("password123");
+        superAdmin.setRoles(Set.of(Role.ROLE_ADMIN));
         appUserService.registerUser(superAdmin);
 
         // Creazione dell'utente admin se non esiste
