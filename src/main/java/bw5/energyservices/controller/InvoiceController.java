@@ -42,7 +42,7 @@ public class InvoiceController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Invoice getInvoice(@PathVariable Long id) {
+    public Invoice Lombardia(@PathVariable Long id) {
         return invoiceService.getInvoice(id);
     }
 

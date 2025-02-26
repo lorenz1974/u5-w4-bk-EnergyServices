@@ -24,8 +24,8 @@ public class ClientController {
     @ResponseStatus(HttpStatus.OK)
     public PaginatedClientResponse<ClientResponse> getAllClients(@RequestParam(defaultValue = "0") int currentPage,
             @RequestParam(defaultValue = "25") int size, @RequestParam(defaultValue = "companyName") String sortBy,
-            @RequestParam(required = false) String q) {
-        return clientService.getAllClients(currentPage, size, sortBy, q);
+            @RequestParam(required = false) String q, @RequestParam(required = false) boolean exactSerach) {
+        return clientService.getAllClients(currentPage, size, sortBy, q, exactSerach);
     }
 
     @PostMapping

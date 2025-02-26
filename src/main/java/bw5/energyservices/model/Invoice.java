@@ -3,6 +3,7 @@ package bw5.energyservices.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 
 import jakarta.persistence.Column;
@@ -47,7 +48,8 @@ public class Invoice {
     @NotNull
     @ManyToOne
     @JoinColumn(name = "cliente_id")
-    @JsonIncludeProperties(value = { "id", "companyName", "vatNumber", "email" })
+    // @JsonIncludeProperties(value = { "id", "companyName", "vatNumber", "email" })
+    @JsonIgnoreProperties(value = { "invoices" })
     private Client client;
 
 }

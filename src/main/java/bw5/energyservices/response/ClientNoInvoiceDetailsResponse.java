@@ -11,6 +11,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import bw5.energyservices.model.Address;
 import bw5.energyservices.model.Client;
 import bw5.energyservices.model.Invoice;
 import bw5.energyservices.model.InvoiceSummary;
@@ -46,6 +47,9 @@ public class ClientNoInvoiceDetailsResponse {
 
     private String companyLogo;
 
+    private Address mainAddress;
+    private Address operationalAddress;
+
     @JsonIgnoreProperties(value = { "client" })
     private List<Invoice> invoices;
 
@@ -67,6 +71,8 @@ public class ClientNoInvoiceDetailsResponse {
         this.contactPhone = client.getContactPhone();
         this.companyLogo = client.getCompanyLogo();
         this.invoices = client.getInvoices();
+        this.mainAddress = client.getMainAddress();
+        this.operationalAddress = client.getOperationalAddress();
         this.invoiceSummary = new InvoiceSummary(this.invoices).getInvoiceSummary();
     }
 }

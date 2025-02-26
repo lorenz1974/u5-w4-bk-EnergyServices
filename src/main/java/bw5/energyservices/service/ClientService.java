@@ -94,7 +94,8 @@ public class ClientService {
         clientRepository.deleteById(id);
     }
 
-    public PaginatedClientResponse<ClientResponse> getAllClients(int currentPage, int size, String sortBy, String q) {
+    public PaginatedClientResponse<ClientResponse> getAllClients(int currentPage, int size, String sortBy, String q,
+            boolean exactSearch) {
         Page<Client> clients;
         PageRequest pageRequest = PageRequest.of(currentPage, size, Sort.by(sortBy));
         if (q == null || q.isEmpty()) {
