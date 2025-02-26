@@ -1,6 +1,7 @@
 package bw5.energyservices.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -52,6 +53,7 @@ public class Client {
 
     private String companyLogo;
 
+    @NotNull
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "main_address_id", referencedColumnName = "id")
     private Address mainAddress;

@@ -1,7 +1,7 @@
 package bw5.energyservices.service;
 
+import bw5.energyservices.model.Address;
 import bw5.energyservices.model.Client;
-import bw5.energyservices.model.Invoice;
 import bw5.energyservices.repository.ClientRepository;
 import bw5.energyservices.request.ClientRequest;
 import bw5.energyservices.response.ClientNoInvoiceDetailsResponse;
@@ -30,7 +30,11 @@ import java.util.stream.Collectors;
 public class ClientService {
 
     private final ClientRepository clientRepository;
+    private final AddressService addressService;
 
+    //
+    // Metodo con ClientRequest
+    //
     public ClientResponse createClient(@Valid ClientRequest clientRequestDTO) {
         // Verifica che non esista il nome della compagnia
         if (clientRepository.existsByCompanyName(clientRequestDTO.getCompanyName())) {
@@ -43,9 +47,36 @@ public class ClientService {
 
         Client client = new Client();
         BeanUtils.copyProperties(clientRequestDTO, client);
+
+        // Setto gli uffici
+        // Main address è obbligatorio
+        Address mainAddress = addressService.findById(clientRequestDTO.getMainAddressId());
+        client.setMainAddress(mainAddress);
+
+        // Se presente, setto l'indirizzo operativo
+        if (clientRequestDTO.getOperationalAddressId() != null) {
+            Address operationalAddress = addressService.findById(clientRequestDTO.getOperationalAddressId());
+            client.setOperationalAddress(operationalAddress);
+        }
         client = clientRepository.save(client);
 
         return responseFromEntity(client);
+    }
+
+    //
+    // Metodo con Client (per runner)
+    //
+    public Client createClient(Client client) {
+        // Verifica che non esista il nome della compagnia
+        if (clientRepository.existsByCompanyName(client.getCompanyName())) {
+            throw new EntityExistsException("Company name already exists");
+        }
+        // Verifica che non esista il numero di partita IVA
+        if (clientRepository.existsByVatNumber(client.getVatNumber())) {
+            throw new EntityExistsException("Vat number already exists");
+        }
+        client = clientRepository.save(client);
+        return client;
     }
 
     public ClientResponse updateClient(Long id, ClientRequest clientRequestDTO) {
@@ -98,8 +129,7 @@ public class ClientService {
         if (client.getInvoices() != null) {
             client.getInvoices().forEach(invoice -> invoice.setClient(null));
         }
-        ClientNoInvoiceDetailsResponse response = new ClientNoInvoiceDetailsResponse();
-        BeanUtils.copyProperties(client, response);
+        ClientNoInvoiceDetailsResponse response = new ClientNoInvoiceDetailsResponse(client);
         return response;
     }
 

@@ -25,7 +25,7 @@ public class InvoiceResponse {
     @JsonIncludeProperties(value = { "status" })
     private InvoiceStatus invoiceStatus;
 
-    private BigDecimal amount;
+    private Double amount;
 
     @JsonIncludeProperties(value = { "id", "companyName", "vatNumber" })
     private Client client;

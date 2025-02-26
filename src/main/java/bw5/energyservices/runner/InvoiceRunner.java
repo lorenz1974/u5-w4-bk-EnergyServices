@@ -55,7 +55,7 @@ public class InvoiceRunner implements CommandLineRunner {
 
         log.info("Invoice statuses created.");
 
-        log.info("Creating 250 invoices...");
+        log.info("Creating 550 invoices...");
         // Cerca il numero dei clienti nel DB
         long clientCount = clientRepository.count();
         log.debug("Clients count: {}", clientCount);
@@ -68,8 +68,8 @@ public class InvoiceRunner implements CommandLineRunner {
         long invoiceStatusCount = invoiceStatusRepository.count();
         log.debug("Invoice statuses count: {}", invoiceStatusCount);
 
-        // Crea 50 fatture
-        for (int i = 0; i < 250; i++) {
+        // Crea fatture
+        for (int i = 0; i < 550; i++) {
 
             //
             // La fattura viene creata con una data successiva alla precedente di massimo
@@ -92,12 +92,13 @@ public class InvoiceRunner implements CommandLineRunner {
             invoice.setInvoiceDate(invoiceDate);
             invoice.setInvoiceNumber(String.format("%06d", i));
 
-            Client client = clientRepository.findById(faker.number().numberBetween(1, clientCount)).get();
+            Client client = clientRepository.findById(faker.number().numberBetween(1, clientCount + 1)).get();
             log.debug("Client: {}", client.toString());
             invoice.setClient(client);
-            invoice.setAmount(BigDecimal.valueOf(faker.number().randomDouble(2, 9, 10000)));
 
-            long randomStatusId = faker.number().numberBetween(1, invoiceStatusCount);
+            invoice.setAmount(Double.valueOf(faker.number().randomDouble(2, 9, 10000)));
+
+            long randomStatusId = faker.number().numberBetween(1, invoiceStatusCount + 1);
             InvoiceStatus randomStatus = invoiceStatusRepository.findById(randomStatusId).get();
             log.debug("Random status: {}", randomStatus);
 

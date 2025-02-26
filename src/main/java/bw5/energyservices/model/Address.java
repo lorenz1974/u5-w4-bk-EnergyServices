@@ -21,4 +21,6 @@ public class Address {
     @ManyToOne
     @JoinColumn(name = "city_complete_id")
     private CityComplete city;
+
+    private boolean mainAddress;
 }

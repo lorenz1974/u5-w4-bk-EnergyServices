@@ -1,5 +1,6 @@
 package bw5.energyservices.response;
 
+import bw5.energyservices.model.Address;
 import bw5.energyservices.model.Client;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -48,6 +49,8 @@ public class ClientResponse {
     private String contactLastName;
     private String contactPhone;
     private String companyLogo;
+    private Address mainAddress;
+    private Address operationalAddress; // Optional
 
     //
     // Constructor to create a ClientResponse object from a Client entity
@@ -70,5 +73,9 @@ public class ClientResponse {
         this.contactLastName = client.getContactLastName();
         this.contactPhone = client.getContactPhone();
         this.companyLogo = client.getCompanyLogo();
+        this.mainAddress = client.getMainAddress();
+        this.operationalAddress = client.getOperationalAddress() != null
+                ? client.getOperationalAddress()
+                : null;
     }
 }

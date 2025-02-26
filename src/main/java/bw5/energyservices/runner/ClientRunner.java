@@ -1,33 +1,36 @@
 package bw5.energyservices.runner;
 
+import bw5.energyservices.model.Address;
 import bw5.energyservices.model.Client;
-import bw5.energyservices.repository.ClientRepository;
-import bw5.energyservices.request.ClientRequest;
+import bw5.energyservices.repository.CityCompleteRepository;
+import bw5.energyservices.request.AddressRequest;
+import bw5.energyservices.service.AddressService;
 import bw5.energyservices.service.ClientService;
+import jakarta.transaction.Transactional;
 
 import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Order(3)
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class ClientRunner implements CommandLineRunner {
 
     private final Faker faker;
     private final ClientService clientService;
+    private final CityCompleteRepository cityCompleteRepository;
+    private final AddressService addressService;
 
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlAuto;
@@ -42,8 +45,11 @@ public class ClientRunner implements CommandLineRunner {
             return;
         }
 
-        log.info("Creazione 50 Client...");
-        for (int i = 0; i < 50; i++) {
+        long cityCount = cityCompleteRepository.count();
+        log.debug("Number of Cities in the DB: {}", cityCount);
+
+        log.info("Creation of 150 Clients...");
+        for (int i = 0; i < 150; i++) {
 
             Client client = new Client();
             client.setCompanyName(faker.company().name());
@@ -60,24 +66,48 @@ public class ClientRunner implements CommandLineRunner {
             client.setContactPhone(faker.phoneNumber().phoneNumber());
             client.setContactFirstName(faker.name().firstName());
             client.setContactLastName(faker.name().lastName());
-            client.setCompanyLogo(faker.internet().avatar());
+            client.setCompanyLogo(
+                    "https://eu.ui-avatars.com/api/?size=250&name=" +
+                            client.getCompanyName()
+                                    .replace(" ", "+"));
 
-            log.debug("Client: {}", client);
+            for (int j = 0; j < faker.number().numberBetween(1, 3); j++) {
+                AddressRequest officeAddress = new AddressRequest();
+                officeAddress.setStreet(faker.address().streetAddress());
+                officeAddress.setCityId(faker.number().numberBetween(1, cityCount + 1));
+                officeAddress.setZipCode(faker.address().zipCode());
 
-            ClientRequest clientRequest = new ClientRequest();
-            BeanUtils.copyProperties(client, clientRequest);
+                // Se è il primo ufficio creato, lo imposta come indirizzo principale
+                officeAddress.setMainAddress(j == 0);
 
+                try {
+                    Address createdOfficeAddress = addressService.createAddress(officeAddress);
+                    log.debug("Office Address[{}]: {}", j, createdOfficeAddress);
+
+                    if (j == 0) {
+                        client.setMainAddress(createdOfficeAddress);
+                    } else {
+                        client.setOperationalAddress(createdOfficeAddress);
+                    }
+                } catch (IllegalArgumentException e) {
+                    log.error("IllegalArgumentException: {}", e.getMessage());
+                } catch (Exception e) {
+                    log.error("Error creating address for client {}: {}", client.getCompanyName(), e.getMessage());
+                }
+            }
+
+            // Salvo il cliente
             try {
-                clientService.createClient(clientRequest);
-                log.debug("Client {} created successfully.", clientRequest.getCompanyName());
+                Client clientCreated = clientService.createClient(client);
+                log.debug("Client created successfully: {}", clientCreated);
             } catch (IllegalArgumentException e) {
                 log.error("IllegalArgumentException: {}", e.getMessage());
             } catch (Exception e) {
-                log.error("Exception: {}", e.getMessage());
+                log.error("Error creating the client {}: {}", client, e.getMessage());
             }
 
         }
-        log.info("Clients creati e salvati nel DB!");
+        log.info("Clients created and saved in the DB!");
 
     }
 

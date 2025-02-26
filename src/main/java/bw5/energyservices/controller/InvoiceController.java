@@ -3,14 +3,13 @@ package bw5.energyservices.controller;
 import bw5.energyservices.model.Invoice;
 import bw5.energyservices.request.InvoiceRequest;
 import bw5.energyservices.response.InvoiceResponse;
+import bw5.energyservices.response.PaginatedClientResponse;
 import bw5.energyservices.service.InvoiceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/invoices")
@@ -22,8 +21,10 @@ public class InvoiceController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<InvoiceResponse> getAllInvoices() {
-        return invoiceService.getAllInvoices();
+    public PaginatedClientResponse<InvoiceResponse> getAllInvoices(@RequestParam(defaultValue = "0") int currentPage,
+            @RequestParam(defaultValue = "25") int size, @RequestParam(defaultValue = "invoiceNumber") String sortBy,
+            @RequestParam(required = false) String q) {
+        return invoiceService.getAllInvoices(currentPage, size, sortBy, q);
     }
 
     @PostMapping
@@ -33,7 +34,6 @@ public class InvoiceController {
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
     public InvoiceResponse updateInvoice(@PathVariable Long id,
             @Valid @RequestBody InvoiceRequest invoiceRequest) {
         InvoiceResponse response = invoiceService.updateInvoice(id, invoiceRequest);

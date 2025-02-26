@@ -3,9 +3,16 @@ package bw5.energyservices.controller;
 import bw5.energyservices.model.CityComplete;
 import bw5.energyservices.service.CityCompleteService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,6 +22,7 @@ public class CityCompleteController {
     private final CityCompleteService cityCompleteService;
 
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public CityComplete findById(@PathVariable Long id) {
         return cityCompleteService.findById(id);
     }
@@ -32,25 +40,25 @@ public class CityCompleteController {
      * GET /cities?cityName=Roma&province=Milano
      */
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public List<CityComplete> searchCities(
             @RequestParam(required = false) String cityName,
             @RequestParam(required = false) String province,
             @RequestParam(required = false) boolean exactSearch) {
 
-        if (cityName != null && province != null && exactSearch == false) {
-            return cityCompleteService.findByNameContainingIgnoreCaseOrProvinceContainingIgnoreCase(cityName,
-                    province);
-        } else if (cityName != null && exactSearch == false) {
-            return cityCompleteService.findByNameContainingIgnoreCase(cityName);
-        } else if (province != null && exactSearch == false) {
-            return cityCompleteService.findByProvinceContainingIgnoreCase(province);
-        } else if (cityName != null && province != null && exactSearch == true) {
-            return cityCompleteService.findByNameIgnoreCaseOrProvinceIgnoreCase(cityName,
-                    province);
-        } else if (cityName != null && exactSearch == true) {
-            return cityCompleteService.findByNameIgnoreCase(cityName);
-        } else if (province != null && exactSearch == true) {
-            return cityCompleteService.findByProvinceIgnoreCase(province);
+        if (cityName != null && province != null) {
+            return exactSearch
+                    ? cityCompleteService.findByNameIgnoreCaseOrProvinceIgnoreCase(cityName, province)
+                    : cityCompleteService.findByNameContainingIgnoreCaseOrProvinceContainingIgnoreCase(cityName,
+                            province);
+        } else if (cityName != null) {
+            return exactSearch
+                    ? cityCompleteService.findByNameIgnoreCase(cityName)
+                    : cityCompleteService.findByNameContainingIgnoreCase(cityName);
+        } else if (province != null) {
+            return exactSearch
+                    ? cityCompleteService.findByProvinceIgnoreCase(province)
+                    : cityCompleteService.findByProvinceContainingIgnoreCase(province);
         } else {
             return cityCompleteService.findAll();
         }

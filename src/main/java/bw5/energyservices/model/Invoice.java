@@ -42,7 +42,7 @@ public class Invoice {
     private InvoiceStatus invoiceStatus;
 
     @Column(nullable = false)
-    private BigDecimal amount;
+    private Double amount;
 
     @NotNull
     @ManyToOne

@@ -1,6 +1,7 @@
 package bw5.energyservices.request;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
@@ -55,5 +56,12 @@ public class ClientRequest {
 
     @NotNull(message = "Company logo cannot be null")
     private String companyLogo;
+
+    @NotNull(message = "Main address cannot be null")
+    @Min(value = 1, message = "Main address ID must be greater than 0")
+    private long mainAddressId;
+
+    @Min(value = 1, message = "Operational address ID must be greater than 0")
+    private Long operationalAddressId = null;
 
 }

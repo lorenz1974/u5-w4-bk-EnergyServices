@@ -23,4 +23,6 @@ public class AddressRequest {
         @NotNull(message = "Zip code cannot be null")
         @Size(min = 5, max = 5, message = "Zip code must be 5 characters")
         private String zipCode;
+
+        private boolean mainAddress;
 }

@@ -4,15 +4,21 @@ import bw5.energyservices.model.Invoice;
 import bw5.energyservices.repository.InvoiceRepository;
 import bw5.energyservices.request.InvoiceRequest;
 import bw5.energyservices.response.InvoiceResponse;
+import bw5.energyservices.response.PaginatedClientResponse;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,8 +56,25 @@ public class InvoiceService {
         invoiceRepository.deleteById(id);
     }
 
-    public List<InvoiceResponse> getAllInvoices() {
-        return responseFromEntityList(invoiceRepository.findAll());
+    public PaginatedClientResponse<InvoiceResponse> getAllInvoices(int currentPage, int size, String sortBy, String q) {
+        Page<Invoice> invoices;
+        PageRequest pageRequest = PageRequest.of(currentPage, size, Sort.by(sortBy));
+
+        invoices = invoiceRepository.findAll(pageRequest);
+
+        // if (q == null || q.isEmpty()) {
+        // invoices = invoiceRepository.findAll(pageRequest);
+        // } else {
+        // String qLower = q.toLowerCase();
+        // invoices = invoiceRepository.omniSearch(qLower, pageRequest);
+        // }
+
+        List<InvoiceResponse> invoiceResponses = invoices.getContent().stream()
+                .map(this::responseFromEntity)
+                .collect(Collectors.toList());
+
+        return new PaginatedClientResponse<>(invoiceResponses, invoices.getTotalPages(), invoices.getTotalElements(),
+                currentPage, size);
     }
 
     public InvoiceResponse responseFromEntity(Invoice invoice) {

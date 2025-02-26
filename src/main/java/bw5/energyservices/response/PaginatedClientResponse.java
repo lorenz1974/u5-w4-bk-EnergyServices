@@ -7,7 +7,6 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-
 public class PaginatedClientResponse<T> {
 
     private List<T> content;
